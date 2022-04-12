@@ -3,7 +3,7 @@
 | Student's name | SCIPER |
 | -------------- | ------ |
 | Guillaume Parchet | 283294 |
-| Alessio Verardo | XXXXXX |
+| Alessio Verardo | 282634 |
 
 ## Mini-project 1: Tic Tac Toe
 
