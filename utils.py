@@ -140,8 +140,30 @@ def plot_game_heatmaps(states, q_vals, titles):
         # Loop over data dimensions and create text annotations.
         for i in range(len(axis_labels)):
             for j in range(len(axis_labels)):
-                text = ax.text(j, i, "{:.2e}".format(vals[i, j]),
-                               ha="center", va="center", color="black")
+                if vals[i,j]!=np.nan:
+                    text = ax.text(j, i, "{:.2e}".format(vals[i, j]),
+                                   ha="center", va="center", color="grey")
 
     fig.tight_layout()
-    plt.show()    
+    plt.show()
+    
+
+def get_max_Mopt_Mrng_for_epsilon(values_mopt_mrng, epsilon_opts, parameter):
+    max_Mopt = -2.0
+    max_Mrnd = -2.0
+    best_eps_opt = -1
+    best_eps_rnd = -1
+
+    for i, mopt_mrng in enumerate(values_mopt_mrng):
+        m_opt = max(mopt_mrng[0])
+        m_rng = max(mopt_mrng[1])
+
+        if(m_opt > max_Mopt):
+            max_Mopt = m_opt
+            best_eps_opt = epsilon_opts[i]
+        if(m_rng > max_Mrnd):
+            max_Mrnd = m_rng
+            best_eps_rnd = epsilon_opts[i]
+
+    print('Maximal M_opt = {} and is achieved for {} = {}'.format(max_Mopt, parameter, best_eps_opt))
+    print('Maximal M_rnd = {} and is achieved for {} = {}'.format(max_Mrnd, parameter, best_eps_rnd))

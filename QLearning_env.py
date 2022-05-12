@@ -83,6 +83,7 @@ class QTraining:
         self.score_test_opt = []
         self.score_test_rng = []
         
+        
     def reset_parameters(self):
         """
         Reset all the stored parameters and values 
@@ -309,3 +310,4 @@ class QTraining:
         plt.title('Evolution of mean reward (every {} games played) of the learner'.format(self.test_step), fontsize = 20)
         plt.grid()
         plt.show()
+        
