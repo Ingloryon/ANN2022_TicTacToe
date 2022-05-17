@@ -35,16 +35,17 @@ def plots_several_trainings(values, names, avg_step, nb_epoch):
     
 def plots_several_trainings_subfigures(values, names, avg_step, nb_epoch, nrows=3, ncols=2, mopt_mrng=False):
     
-    fig, axs = plt.subplots(nrows=nrows, ncols=ncols, sharex=True, sharey=True, figsize=(18, 10))
+    fig, axs = plt.subplots(nrows=nrows, ncols=ncols, sharex=True, sharey=True, figsize=(18, 14))
     xs = range(0, nb_epoch, avg_step)
     default_colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
     
     i = 0
     for val, name in zip(values, names):
         ax = axs.flat[i]
+        ax.set_yticks(np.arange(-1, 1, 0.1))
         if(mopt_mrng):
             ax.plot(xs, val[0], color='blue', lw=4, label="Against Optimal Player")
-            ax.plot(xs, val[1], color='orange', lw=4, label="Against Random Player")
+            ax.plot(xs, val[1], color='orange', lw=4, label="Against Random Player")       
         else:
             ax.plot(xs, val, color=default_colors[i%len(default_colors)], label=name, lw=2)
         ax.set(xlabel=name)
@@ -54,7 +55,7 @@ def plots_several_trainings_subfigures(values, names, avg_step, nb_epoch, nrows=
         i += 1
 
     fig.text(0.5, 0.04, 'Number of games played', ha='center', fontsize = 22)
-    fig.text(0.04, 0.5, 'Mean reward over {} games'.format(avg_step), va='center', rotation='vertical', fontsize = 15)        
+    fig.text(0.04, 0.5, 'Mean reward over {} games'.format(avg_step), va='center', rotation='vertical', fontsize = 15)
     plt.suptitle('Evolution of mean reward (every {} games played) of the learner'.format(avg_step), fontsize = 15)
     plt.show()
 
