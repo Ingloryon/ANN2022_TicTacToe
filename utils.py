@@ -213,9 +213,9 @@ def plot_game_heatmaps_deep_qlearning(states, agent, grids, turns ,titles):
         state = states[i]
         
         for action in range(9):
-            state = grid_to_state(env.grid,env, self)
+            state = grid_to_state(env.grid,env, agent)
             q_vals = agent.model(state)
-            vals[action//3, action%3]= q_vals[action]
+            vals[action//3, action%3]= q_vals[0][action]
             
         im, cbar = heatmap(vals, axis_labels, axis_labels, ax=ax, cbarlabel="Q-values")
         
@@ -233,3 +233,53 @@ def plot_game_heatmaps_deep_qlearning(states, agent, grids, turns ,titles):
 
     fig.tight_layout()
     plt.show()
+    
+def get_performance_table(qtraining_pol, deepqtraining_pol, qtraining_self, deepqtraining_self):
+    results = []
+    results.append(get_t_train_m_opt_m_rand(qtraining_pol.score_test_opt, qtraining_pol.score_test_rng, qtraining_pol.avg_step))
+    results.append(get_t_train_m_opt_m_rand(deepqtraining_pol.score_test_opt, deepqtraining_pol.score_test_rng, deepqtraining_pol.AVG_STEP))
+    results.append(get_t_train_m_opt_m_rand(qtraining_self.score_test_opt, qtraining_self.score_test_rng, qtraining_self.avg_step))
+    results.append(get_t_train_m_opt_m_rand(deepqtraining_self.score_test_opt, deepqtraining_self.score_test_rng, deepqtraining_self.AVG_STEP))
+   
+
+    rcolors = plt.cm.BuPu(np.full(4, 0.1))
+    ccolors = plt.cm.BuPu(np.full(3, 0.1))
+    
+    collabel=("$M_{RAND}$", "$M_{OPT}$", "$T_{train}$")
+    rowlabel=("QLearning - Optimal policy", "DeepQLearning - Optimal policy","QLearning - Self learning","DeepQLearning - Self learning")
+    plt.axis('off')
+    
+    the_table = plt.table(cellText=results,
+                      rowLabels=rowlabel,
+                      rowColours=rcolors,
+                      rowLoc='right',
+                      colColours=ccolors,
+                      colLabels=collabel,
+                      loc='center')
+    the_table.scale(2, 2)
+    the_table.set_fontsize(14)
+    fig_background_color = 'skyblue'
+    fig_border = 'steelblue'
+    plt.figure(linewidth=2,
+           edgecolor=fig_border,
+           facecolor=fig_background_color
+          )
+    
+    
+    
+    
+def get_t_train_m_opt_m_rand(opt, rng, step):
+    low_opt, high_opt = opt[0], np.mean(opt[-4])
+    thresh_opt = 0.8*(-high_opt+low_opt)
+    idx_opt = [y > thresh_opt for y in opt].index(True)
+    
+    low_rng, high_rng = rng[0], np.mean(rng[-4])
+    thresh_rng = 0.8*(high_rng-low_rng) if high_rng > 0 else 0.8*(low_rng-high_rng)
+    
+    idx_rng = [y > thresh_rng for y in rng].index(True)
+    return [high_rng,high_opt, max(idx_rng, idx_opt)*step] 
+    
+    
+    
+    
+    
