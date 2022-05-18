@@ -176,15 +176,15 @@ def plot_game_heatmaps(states, q_vals, titles):
     plt.show()
     
 
-def get_max_Mopt_Mrng_for_epsilon(values_mopt_mrng, epsilon_opts, parameter):
+def get_max_Mopt_Mrng_for_epsilon(values_mopt_mrng, epsilon_opts, parameter, n_last_iter=8):
     max_Mopt = -2.0
     max_Mrnd = -2.0
     best_eps_opt = -1
     best_eps_rnd = -1
 
     for i, mopt_mrng in enumerate(values_mopt_mrng):
-        m_opt = max(mopt_mrng[0])
-        m_rng = max(mopt_mrng[1])
+        m_opt = max(mopt_mrng[0][:-n_last_iter])
+        m_rng = max(mopt_mrng[1][:-n_last_iter])
 
         if(m_opt > max_Mopt):
             max_Mopt = m_opt
@@ -195,7 +195,7 @@ def get_max_Mopt_Mrng_for_epsilon(values_mopt_mrng, epsilon_opts, parameter):
 
     print('Maximal M_opt = {} and is achieved for {} = {}'.format(max_Mopt, parameter, best_eps_opt))
     print('Maximal M_rnd = {} and is achieved for {} = {}'.format(max_Mrnd, parameter, best_eps_rnd))
-    
+    return (max_Mrnd, max_Mopt), (best_eps_rnd, best_eps_opt)
     
     
 def plot_game_heatmaps_deep_qlearning(states, agent, grids, turns ,titles):
