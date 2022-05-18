@@ -6,6 +6,7 @@ from numpy.random import default_rng
 from tqdm import tqdm
 from tic_env import TictactoeEnv, OptimalPlayer
 import matplotlib.pyplot as plt
+import torch
 
 
 def action_to_key(action,  state):
@@ -31,6 +32,32 @@ def plots_several_trainings(values, names, avg_step, nb_epoch):
     plt.grid()
     plt.legend(loc=2)
     plt.show()
+    
+    
+def get_other_player(player):
+    """
+    Get the other opponent player name
+    :param player: the current player name
+    :return: the opponent player name
+    """
+    return "X" if player == "O" else "O"
+def grid_to_state(grid,  env, player):
+    """
+    Convert the numpy grid to a tensor according to the definition in the handout
+    :param env: the current environement of the game
+    :param player: our current learner
+    """
+    return torch.tensor([grid==env.player2value[player.player], grid==env.player2value[get_other_player(player.player)]],dtype=torch.float).unsqueeze(0)
+
+def empty(grid):
+        '''return all empty positions'''
+        avail = []
+        for i in range(9):
+            pos = (int(i/3), i % 3)
+            if grid[pos] == 0:
+                avail.append(i)
+        return avail
+    
 
     
 def plots_several_trainings_subfigures(values, names, avg_step, nb_epoch, nrows=3, ncols=2, mopt_mrng=False):
@@ -168,5 +195,41 @@ def get_max_Mopt_Mrng_for_epsilon(values_mopt_mrng, epsilon_opts, parameter, n_l
 
     print('Maximal M_opt = {} and is achieved for {} = {}'.format(max_Mopt, parameter, best_eps_opt))
     print('Maximal M_rnd = {} and is achieved for {} = {}'.format(max_Mrnd, parameter, best_eps_rnd))
-    
     return (max_Mrnd, max_Mopt), (best_eps_rnd, best_eps_opt)
+    
+    
+def plot_game_heatmaps_deep_qlearning(states, agent, grids, turns ,titles):
+    
+    fig, axs = plt.subplots(len(states)//3, 3, figsize=(16, 16))
+    axis_labels = ['1', '2', '3']
+    
+    for i in range(0, len(states)):
+        env = TictactoeEnv()
+        env.grid = grids[i]
+        agent.player = turns[i]
+        
+        ax = axs[i]
+        vals = np.zeros((3,3))
+        state = states[i]
+        
+        for action in range(9):
+            state = grid_to_state(env.grid,env, self)
+            q_vals = agent.model(state)
+            vals[action//3, action%3]= q_vals[action]
+            
+        im, cbar = heatmap(vals, axis_labels, axis_labels, ax=ax, cbarlabel="Q-values")
+        
+        # Show all ticks and label them with the respective list entries
+        ax.set_xticks(np.arange(len(axis_labels)), labels=axis_labels)
+        ax.set_yticks(np.arange(len(axis_labels)), labels=axis_labels)
+        ax.set_title(titles[i], fontsize=15)
+
+        # Loop over data dimensions and create text annotations.
+        for i in range(len(axis_labels)):
+            for j in range(len(axis_labels)):
+                if vals[i,j]!=np.nan:
+                    text = ax.text(j, i, "{:.2e}".format(vals[i, j]),
+                                   ha="center", va="center", color="grey")
+
+    fig.tight_layout()
+    plt.show()
