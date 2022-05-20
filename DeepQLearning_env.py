@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
-from tqdm import tqdm
+from tqdm.notebook import tqdm
 import random
 import numpy as np
 from tic_env import TictactoeEnv, OptimalPlayer
@@ -109,6 +109,8 @@ class DeepQTraining():
         self.agent1 = DeepQPlayer(self.policy_network)
         self.agent2 = DeepQPlayer(self.policy_network)
         self.optim = optim.Adam(self.policy_network.parameters(), lr=self.LEARNING_RATE)
+        
+        self.scheduler = optim.lr_scheduler.MultiStepLR(self.optim, milestones=[10000,15000], gamma=0.1)
         self.criterion = nn.HuberLoss()
         self.env = TictactoeEnv()
         
@@ -442,6 +444,8 @@ class DeepQTraining():
                 opt_player = OptimalPlayer(adversary_epsilon, player=self.turns[e%2])
                 # Simulate a game for the current epoch  
                 reward, loss = self.simulate_game(self.env, opt_player, self.agent1, epsilon_greedy(e))
+            # Update the scheduler number of steps by one
+            self.scheduler.step()
             
             acc_rew += reward
             acc_loss += loss
