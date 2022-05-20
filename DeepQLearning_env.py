@@ -84,7 +84,7 @@ class DeepQTraining():
         self.MAX_GAME_LENGTH = 9
         self.turns = np.array(['X','O'])
         self.N_ACTIONS = 9
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device("cpu")#torch.device("cuda" if torch.cuda.is_available() else "cpu")
         
         self.TEST_STEP = 250
         self.NB_TEST_GAME = 500
