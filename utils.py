@@ -176,7 +176,7 @@ def plot_game_heatmaps(states, q_vals, titles):
     plt.show()
     
 
-def get_max_Mopt_Mrng_for_epsilon(values_mopt_mrng, epsilon_opts, parameter, n_last_iter=2):
+def get_max_Mopt_Mrng_for_epsilon(values_mopt_mrng, epsilon_opts, parameter, n_last_iter=8):
     max_Mopt = -2.0
     max_Mrnd = -2.0
     best_eps_opt = -1
@@ -266,18 +266,16 @@ def get_performance_table(qtraining_pol, deepqtraining_pol, qtraining_self, deep
           )
     
     
-    
-    
-def get_t_train_m_opt_m_rand(opt, rng, step):
-    low_opt, high_opt = opt[0], np.mean(opt[-4])
+def get_t_train_m_opt_m_rand(opt, rng, step, n_last_iter=8):
+    low_opt, high_opt = opt[0], np.mean(opt[-4:])
     thresh_opt = 0.8*(-high_opt+low_opt)
     idx_opt = [y > thresh_opt for y in opt].index(True)
     
-    low_rng, high_rng = rng[0], np.mean(rng[-4])
+    low_rng, high_rng = rng[0], np.mean(rng[-4:])
     thresh_rng = 0.8*(high_rng-low_rng) if high_rng > 0 else 0.8*(low_rng-high_rng)
     
     idx_rng = [y > thresh_rng for y in rng].index(True)
-    return [high_rng,high_opt, max(idx_rng, idx_opt)*step] 
+    return [np.max(rng[-n_last_iter:]),np.max(opt[-n_last_iter:]), max(idx_rng, idx_opt)*step] 
     
     
     
