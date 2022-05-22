@@ -18,9 +18,9 @@ class DeepQNetwork(nn.Module):
     """
     def __init__(self):
         super().__init__()
-        self.hidden1 = nn.Linear(18, 100)
-        self.hidden2 = nn.Linear(100, 100)
-        self.output = nn.Linear(100, 9)
+        self.hidden1 = nn.Linear(18, 128)
+        self.hidden2 = nn.Linear(128, 128)
+        self.output = nn.Linear(128, 9)
         
     def forward(self, x): 
         x = x.flatten(1)
@@ -342,10 +342,12 @@ class DeepQTraining():
                 # If the chosen move is valid, perform it and ovserve the reward
                 _, end, winner = env.step(move_int)
                 reward = env.reward(round_player)
+                valid_move=True
             else:
                 # If the chosen move is not valid, end the game and store a reward of -1
                 end = True
                 reward = -1
+                valid_move = False
                 
             if round_player == learner1.player:
                 prev_reward = reward
@@ -363,7 +365,6 @@ class DeepQTraining():
                     if round_player == learner2.player:
                         self.save_to_buffer_memory_and_update(prev_grid, learner2, prev_move2, True, reward)
                         loss_to_return = self.save_to_buffer_memory_and_update(prev_grid_learner, learner1, prev_move, True, env.reward(learner1.player))
-                        
                     else:
                         self.save_to_buffer_memory_and_update(prev_grid_learner2, learner2, prev_move2, True, env.reward(learner2.player))
                         loss_to_return = self.save_to_buffer_memory_and_update(prev_grid, learner1, prev_move, True, reward)
@@ -444,6 +445,7 @@ class DeepQTraining():
                 opt_player = OptimalPlayer(adversary_epsilon, player=self.turns[e%2])
                 # Simulate a game for the current epoch  
                 reward, loss = self.simulate_game(self.env, opt_player, self.agent1, epsilon_greedy(e))
+                
             # Update the scheduler number of steps by one
             self.scheduler.step()
             
