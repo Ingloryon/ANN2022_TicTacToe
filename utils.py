@@ -85,6 +85,34 @@ def plots_several_trainings_subfigures(values, names, avg_step, nb_epoch, nrows=
     fig.text(0.04, 0.5, 'Mean reward over {} games'.format(avg_step), va='center', rotation='vertical', fontsize = 15)
     plt.suptitle('Evolution of mean reward (every {} games played) of the learner'.format(avg_step), fontsize = 15)
     plt.show()
+    
+
+def plots_mopt_mrand_for_several_values(values, names, avg_step, nb_epoch):
+    
+    fig, ax = plt.subplots(nrows=1, ncols=2, sharex=True, sharey=True, figsize=(20, 7))
+    xs = range(0, nb_epoch, avg_step)
+    default_colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
+    
+    i = 0
+    for val, name in zip(values, names):
+        ax[0].plot(xs, val[0], color=default_colors[i], lw=2, label=names[i])
+        ax[1].plot(xs, val[1], color=default_colors[i], lw=2, label=names[i])
+
+        
+        i += 1
+    
+    ax[0].grid()
+    ax[1].grid()
+    ax[0].legend(loc=2)
+    ax[1].legend(loc=4)
+    ax[0].set_title("Against Optimal Player")
+    ax[1].set_title("Against Random Player")
+    
+    plt.yticks(np.arange(-1, 1, 0.1))
+    fig.text(0.5, 0.04, 'Number of games played', ha='center', fontsize = 22)
+    fig.text(0.04, 0.5, 'Mean reward over {} games'.format(avg_step), va='center', rotation='vertical', fontsize = 15)
+    plt.suptitle('Evolution of mean reward (every {} games played) of the learner'.format(avg_step), fontsize = 15)
+    plt.show()
 
     
 # Source code: https://matplotlib.org/3.5.0/gallery/images_contours_and_fields/image_annotated_heatmap.html
@@ -210,7 +238,6 @@ def plot_game_heatmaps_deep_qlearning(states, agent, grids, turns ,titles):
         
         ax = axs[i]
         vals = np.zeros((3,3))
-        state = states[i]
         
         for action in range(9):
             state = grid_to_state(env.grid,env, agent)

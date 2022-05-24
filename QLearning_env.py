@@ -14,6 +14,8 @@ def get_state_best_Q(state, Q_vals, player_rnd):
          # optimal choice wrt policy (eps-greedy)
         best_Q = -math.inf
         best_key = None
+        all_max = []
+        all_keys = []
 
         for a in pot_actions:                    
             key = action_to_key(a, state)
@@ -21,9 +23,15 @@ def get_state_best_Q(state, Q_vals, player_rnd):
             Q_a = Q_vals.get(key, 0)
 
             if (Q_a > best_Q):
+                all_max = [Q_a]
+                all_keys = [key]
                 best_Q = Q_a
-                best_key = key
-        return best_key, best_Q
+            elif Q_a == best_Q:
+                all_max.append(Q_a)
+                all_keys.append(key)
+                
+        sel = random.randint(0, len(all_max)-1)
+        return all_keys[sel], all_max[sel]
 
 class QPlayer:
     def __init__(self, player_name, seed):
