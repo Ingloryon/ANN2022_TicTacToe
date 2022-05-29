@@ -10,17 +10,35 @@ import torch
 
 
 def action_to_key(action,  state):
+    """
+    Transform an (action, state) pair to a key that can be used to get Q-values in the dictionnary.
+    :param action: the chosen action
+    :param state: the numpy representation of the grid.
+    :return: a tuple representing the action and the grid in a string format
+    """
     if type(action) is tuple:
         action = action[0]*3 + action[1]
     return (action, grid_to_string(state))
 
 
 def grid_to_string(grid):
+    """
+    Transform the given TicTacToe grid into a string.
+    :param grid: the numpy representation of the grid
+    :return: the string representation 
+    """
     char_rep= {0:'-', 1: 'X',-1:'O'}
     return ''.join([char_rep[x] for x in grid.flatten()])
 
 
 def plots_several_trainings(values, names, avg_step, nb_epoch):
+    """
+    Plot several training curves 
+    :param values: List of list of values encounter during training
+    :param names: the name of the curves
+    :param avg_step: the avg_step at which we compute the performances
+    :param nb_epoch: the total number of epoch during training
+    """
     plt.figure(figsize=(20, 10))
     xs = range(0, nb_epoch, avg_step)
     for val, name in zip(values, names):
@@ -50,18 +68,31 @@ def grid_to_state(grid,  env, player):
     return torch.tensor([grid==env.player2value[player.player], grid==env.player2value[get_other_player(player.player)]],dtype=torch.float).unsqueeze(0)
 
 def empty(grid):
-        '''return all empty positions'''
-        avail = []
-        for i in range(9):
-            pos = (int(i/3), i % 3)
-            if grid[pos] == 0:
-                avail.append(i)
-        return avail
+    """
+    Return all empty positions in the grid 
+    :param grid: the current numpy representation of the board
+    :return: all the available positions
+    """
+    '''return all empty positions'''
+    avail = []
+    for i in range(9):
+        pos = (int(i/3), i % 3)
+        if grid[pos] == 0:
+            avail.append(i)
+    return avail
     
 
     
 def plots_several_trainings_subfigures(values, names, avg_step, nb_epoch, nrows=3, ncols=2, mopt_mrng=False):
-    
+    """
+    :param values: the list of the list of values encounter during training
+    :param names: the name of the curve
+    :param avg_step: the number of step between performance computation
+    :param nb_epoch: the number of epochs during training
+    :param nrows: the number of rows in the plot
+    :param ncols: the number of columns in the plot
+    :param mopt_mrng: boolean telling if the plot is mopt_mrng or mean reward during training
+    """
     fig, axs = plt.subplots(nrows=nrows, ncols=ncols, sharex=True, sharey=True, figsize=(18, 14))
     xs = range(0, nb_epoch, avg_step)
     default_colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
@@ -88,7 +119,13 @@ def plots_several_trainings_subfigures(values, names, avg_step, nb_epoch, nrows=
     
 
 def plots_mopt_mrand_for_several_values(values, names, avg_step, nb_epoch):
-    
+    """
+    Plot mopt vs mrand for several values of epsilon or n_star
+    :param values: the list of the list of values encounter during training
+    :param names: the name of the curve
+    :param avg_step: the number of step between performance computation
+    :param nb_epoch: the number of epochs during training
+    """
     fig, ax = plt.subplots(nrows=1, ncols=2, sharex=True, sharey=True, figsize=(20, 7))
     xs = range(0, nb_epoch, avg_step)
     default_colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
@@ -174,7 +211,12 @@ def heatmap(data, row_labels, col_labels, ax=None,
 
 
 def plot_game_heatmaps(states, q_vals, titles):
-    
+    """
+    Plot the games heatmap for the Qlearning algorithm
+    :param states: the list of states for which we want to plot the heatmap
+    :param q_vals: the q-value dictionnary
+    :param title: the titles of the plot
+    """
     fig, axs = plt.subplots(len(states)//3, 3, figsize=(16, 16))
     axis_labels = ['1', '2', '3']
     
@@ -205,6 +247,13 @@ def plot_game_heatmaps(states, q_vals, titles):
     
 
 def get_max_Mopt_Mrng_for_epsilon(values_mopt_mrng, epsilon_opts, parameter, n_last_iter=8):
+    """
+    Get the maximal value of M_opt and M_rand for different values of epsilon_opt in the last n_last_iter performance computation
+    :param values_mopt_mrng: the list of performance values encounter during training
+    :param epsilon_opts: the list of epsilon_opts tried
+    :param parameter: the paramter used to test performances
+    :param n_last_iter: the number of last iteration we consider to get the best M_opt and M_rand
+    """
     max_Mopt = -2.0
     max_Mrnd = -2.0
     best_eps_opt = -1
@@ -227,7 +276,14 @@ def get_max_Mopt_Mrng_for_epsilon(values_mopt_mrng, epsilon_opts, parameter, n_l
     
     
 def plot_game_heatmaps_deep_qlearning(states, agent, grids, turns ,titles):
-    
+    """
+    Plot the games heatmap for the Deep Qlearning algorithm
+    :param states: the list of states for which we want to plot the heatmap
+    :param agent: the agent object to predict the Q-values
+    :param grids: the grid to consider 
+    :param turns: list containing the which player the agent is playing
+    :param title: the titles of the plot
+    """
     fig, axs = plt.subplots(len(states)//3, 3, figsize=(16, 16))
     axis_labels = ['1', '2', '3']
     
@@ -262,6 +318,14 @@ def plot_game_heatmaps_deep_qlearning(states, agent, grids, turns ,titles):
     plt.show()
     
 def get_performance_table(qtraining_pol, deepqtraining_pol, qtraining_self, deepqtraining_self):
+    """
+    Create the performance table of qlearning vs deep qlearning.
+    :param qtraining_pol: Q training object for training against optimal policy
+    :param deepqtraining_pol: DeepQ training object for training against optimal policy
+    :param qtraining_self: Q training object for training against itself
+    :param deepqtraining_self: DeepQ training object for training against itself
+    
+    """
     results = []
     results.append(get_t_train_m_opt_m_rand(qtraining_pol.score_test_opt, qtraining_pol.score_test_rng, qtraining_pol.avg_step))
     results.append(get_t_train_m_opt_m_rand(deepqtraining_pol.score_test_opt, deepqtraining_pol.score_test_rng, deepqtraining_pol.AVG_STEP))
@@ -294,6 +358,14 @@ def get_performance_table(qtraining_pol, deepqtraining_pol, qtraining_self, deep
     
     
 def get_t_train_m_opt_m_rand(opt, rng, step, n_last_iter=8):
+    """
+    Get the t_train value for m_opt and m_rand
+    :param opt: list of performances against optimal player
+    :param rng: list of performances against rng player
+    :param step: the average step between performance computation
+    :param n_last_iter: the number of last iteration taking into account to compute the best performances.
+    """
+    
     low_opt, high_opt = opt[0], np.mean(opt[-4:])
     thresh_opt = 0.8*(-high_opt+low_opt)
     idx_opt = [y > thresh_opt for y in opt].index(True)
